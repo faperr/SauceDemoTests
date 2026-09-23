@@ -89,9 +89,10 @@ public class SauceDemoTest extends BaseTest {
                 "Ошибка: в корзине находится другой товар"
         );
 
-        Assert.assertTrue(
-                cartPage.getItemPrice().startsWith("$"),
-                "Ошибка: цена товара не отображается"
+        Assert.assertEquals(
+                cartPage.getItemPrice(),
+                "$29.99",
+                "Ошибка: цена Sauce Labs Backpack указана неверно"
         );
     }
 
@@ -116,6 +117,12 @@ public class SauceDemoTest extends BaseTest {
         );
 
         inventoryPage.addBackpackToCart();
+
+        Assert.assertEquals(
+                inventoryPage.getCartCount(),
+                "1",
+                "Ошибка: товар не был добавлен в корзину"
+        );
 
         inventoryPage.openCart();
 
