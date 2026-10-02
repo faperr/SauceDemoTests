@@ -1,5 +1,12 @@
 package tests;
 
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Owner;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
+import io.qameta.allure.Story;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -8,9 +15,14 @@ import pages.CheckoutPage;
 import pages.InventoryPage;
 import pages.LoginPage;
 
+@Epic("SauceDemo")
+@Feature("UI автотесты интернет-магазина")
+@Owner("Александр Ильин")
 public class SauceDemoTest extends BaseTest {
 
-    @Test
+    @Test(description = "Успешная авторизация стандартного пользователя")
+    @Story("Авторизация")
+    @Severity(SeverityLevel.CRITICAL)
     public void successfulLoginTest() {
 
         LoginPage loginPage =
@@ -36,7 +48,9 @@ public class SauceDemoTest extends BaseTest {
         );
     }
 
-    @Test
+    @Test(description = "Авторизация заблокированного пользователя")
+    @Story("Авторизация")
+    @Severity(SeverityLevel.CRITICAL)
     public void lockedUserLoginTest() {
 
         LoginPage loginPage =
@@ -56,8 +70,57 @@ public class SauceDemoTest extends BaseTest {
         );
     }
 
-    @Test
+    @Test(description = "Авторизация с неправильным паролем")
+    @Story("Авторизация")
+    @Severity(SeverityLevel.NORMAL)
+    public void invalidPasswordLoginTest() {
+
+        LoginPage loginPage =
+                new LoginPage(driver, wait);
+
+        loginPage.login(
+                "standard_user",
+                "wrong_password"
+        );
+
+        String error =
+                loginPage.getErrorMessage();
+
+        Assert.assertTrue(
+                error.toLowerCase().contains("username and password do not match"),
+                "Ошибка: сообщение о неправильном пароле не появилось"
+        );
+    }
+
+    @Test(description = "Добавление Sauce Labs Backpack в корзину")
+    @Story("Корзина")
+    @Severity(SeverityLevel.CRITICAL)
     public void addBackpackToCartTest() {
+
+        LoginPage loginPage =
+                new LoginPage(driver, wait);
+
+        InventoryPage inventoryPage =
+                new InventoryPage(driver, wait);
+
+        loginPage.login(
+                "standard_user",
+                "secret_sauce"
+        );
+
+        inventoryPage.addBackpackToCart();
+
+        Assert.assertEquals(
+                inventoryPage.getCartCount(),
+                "1",
+                "Ошибка: в корзине должен быть один товар"
+        );
+    }
+
+    @Test(description = "Проверка товара и цены в корзине")
+    @Story("Корзина")
+    @Severity(SeverityLevel.NORMAL)
+    public void checkBackpackInCartTest() {
 
         LoginPage loginPage =
                 new LoginPage(driver, wait);
@@ -74,13 +137,6 @@ public class SauceDemoTest extends BaseTest {
         );
 
         inventoryPage.addBackpackToCart();
-
-        Assert.assertEquals(
-                inventoryPage.getCartCount(),
-                "1",
-                "Ошибка: в корзине должен быть один товар"
-        );
-
         inventoryPage.openCart();
 
         Assert.assertEquals(
@@ -89,13 +145,16 @@ public class SauceDemoTest extends BaseTest {
                 "Ошибка: в корзине находится другой товар"
         );
 
-        Assert.assertTrue(
-                cartPage.getItemPrice().startsWith("$"),
-                "Ошибка: цена товара не отображается"
+        Assert.assertEquals(
+                cartPage.getItemPrice(),
+                "$29.99",
+                "Ошибка: цена товара указана неверно"
         );
     }
 
-    @Test
+    @Test(description = "Полное оформление заказа")
+    @Story("Оформление заказа")
+    @Severity(SeverityLevel.BLOCKER)
     public void completeCheckoutTest() {
 
         LoginPage loginPage =
@@ -116,7 +175,6 @@ public class SauceDemoTest extends BaseTest {
         );
 
         inventoryPage.addBackpackToCart();
-
         inventoryPage.openCart();
 
         Assert.assertEquals(
@@ -134,7 +192,6 @@ public class SauceDemoTest extends BaseTest {
         );
 
         checkoutPage.clickContinue();
-
         checkoutPage.clickFinish();
 
         Assert.assertEquals(

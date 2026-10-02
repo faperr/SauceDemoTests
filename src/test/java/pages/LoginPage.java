@@ -1,50 +1,59 @@
 package pages;
 
+import io.qameta.allure.Step;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class LoginPage {
+public class LoginPage extends BasePage {
 
-    private final WebDriver driver;
-    private final WebDriverWait wait;
+    private final By usernameInput =
+            By.id("user-name");
 
-    private final By usernameInput = By.id("user-name");
-    private final By passwordInput = By.id("password");
-    private final By loginButton = By.id("login-button");
-    private final By errorMessage = By.cssSelector("h3[data-test='error']");
+    private final By passwordInput =
+            By.id("password");
 
-    public LoginPage(WebDriver driver, WebDriverWait wait) {
-        this.driver = driver;
-        this.wait = wait;
+    private final By loginButton =
+            By.id("login-button");
+
+    private final By errorMessage =
+            By.cssSelector("h3[data-test='error']");
+
+    public LoginPage(
+            WebDriver driver,
+            WebDriverWait wait
+    ) {
+        super(driver, wait);
     }
 
+    @Step("Ввести логин: {username}")
     public void enterUsername(String username) {
-        wait.until(
-                ExpectedConditions.visibilityOfElementLocated(usernameInput)
-        ).sendKeys(username);
+        type(usernameInput, username);
     }
 
+    @Step("Ввести пароль")
     public void enterPassword(String password) {
-        driver.findElement(passwordInput).sendKeys(password);
+        type(passwordInput, password);
     }
 
+    @Step("Нажать кнопку Login")
     public void clickLogin() {
-        wait.until(
-                ExpectedConditions.elementToBeClickable(loginButton)
-        ).click();
+        click(loginButton);
     }
 
-    public void login(String username, String password) {
+    @Step("Авторизоваться пользователем {username}")
+    public void login(
+            String username,
+            String password
+    ) {
         enterUsername(username);
         enterPassword(password);
         clickLogin();
     }
 
+    @Step("Получить сообщение об ошибке авторизации")
     public String getErrorMessage() {
-        return wait.until(
-                ExpectedConditions.visibilityOfElementLocated(errorMessage)
-        ).getText();
+        return el(errorMessage).getText();
     }
 }
