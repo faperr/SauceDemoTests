@@ -1,14 +1,12 @@
 package pages;
 
+import io.qameta.allure.Step;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class CheckoutPage {
-
-    private final WebDriver driver;
-    private final WebDriverWait wait;
+public class CheckoutPage extends BasePage {
 
     private final By firstNameInput =
             By.id("first-name");
@@ -28,42 +26,36 @@ public class CheckoutPage {
     private final By completeMessage =
             By.cssSelector("[data-test='complete-header']");
 
-    public CheckoutPage(WebDriver driver, WebDriverWait wait) {
-        this.driver = driver;
-        this.wait = wait;
+    public CheckoutPage(
+            WebDriver driver,
+            WebDriverWait wait
+    ) {
+        super(driver, wait);
     }
 
+    @Step("Заполнить данные для оформления заказа")
     public void fillCheckoutForm(
             String firstName,
             String lastName,
             String postalCode
     ) {
-        wait.until(
-                ExpectedConditions.visibilityOfElementLocated(firstNameInput)
-        ).sendKeys(firstName);
-
-        driver.findElement(lastNameInput)
-                .sendKeys(lastName);
-
-        driver.findElement(postalCodeInput)
-                .sendKeys(postalCode);
+        type(firstNameInput, firstName);
+        type(lastNameInput, lastName);
+        type(postalCodeInput, postalCode);
     }
 
+    @Step("Нажать кнопку Continue")
     public void clickContinue() {
-        wait.until(
-                ExpectedConditions.elementToBeClickable(continueButton)
-        ).click();
+        click(continueButton);
     }
 
+    @Step("Нажать кнопку Finish")
     public void clickFinish() {
-        wait.until(
-                ExpectedConditions.elementToBeClickable(finishButton)
-        ).click();
+        click(finishButton);
     }
 
+    @Step("Получить сообщение об успешном оформлении заказа")
     public String getCompleteMessage() {
-        return wait.until(
-                ExpectedConditions.visibilityOfElementLocated(completeMessage)
-        ).getText();
+        return el(completeMessage).getText();
     }
 }
